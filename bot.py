@@ -4,6 +4,7 @@ import discord
 import asyncio
 
 from secrets import token
+from random import randint
 
 client = discord.Client()
 
