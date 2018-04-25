@@ -25,5 +25,8 @@ async def on_message(message):
     elif message.content.startswith('!sleep'):
         await asyncio.sleep(5)
         await client.send_message(message.channel, 'Done sleeping')
+    elif message.content.startswith('!d6'):
+        diceroll = "Rolled a " + str(randint(1,6))
+        await client.send_message(message.channel, diceroll))
 
 client.run(token)
