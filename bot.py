@@ -112,6 +112,13 @@ def save_to_image(finished_map, location, name):
 				output.append(8192 + 131843*multiplier*finished_map[y][x])
 	to_image.putdata(tuple(output))
 	to_image.save(location+name+".png")
+
+	
+def roll_dice(dice_count, dice_size):
+	dice_roll = []
+	for i in range(dice_count):
+		dice_roll.append(randint(1,dice_size))
+	return dice_roll
 # === </functions> ===
 
 
@@ -134,10 +141,12 @@ async def on_message(message):
     elif message.content.startswith('!sleep'):
         await asyncio.sleep(5)
         await client.send_message(message.channel, 'Done sleeping')
-    elif message.content.startswith("!d6"):
-        diceroll = "Rolled a " + str(randint(1,6))
+    elif message.content.startswith("!roll"):  # "!roll 3d6". TODO includes XdY + Z, XdY + ZdN, hits/dicepools, and exploding dice.
+        func_input = message.content[6:].split("d")
+	results = roll_dice(int(func_input[0]), int(func_input[1]))
+	diceroll = "Rolled a " + str(sum(results)) + ", " +str(results)
         await client.send_message(message.channel, diceroll))
-    elif message.content.startswith("!map"):  # Example of syntax: "!map 400, 800" to produce a 400x800 map
+    elif message.content.startswith("!map"):  # "!map 400, 800".
         DIMENSIONS = message.content[5:].split(", ")
         save_to_image(delake(blur(walk(build(int(DIMENSIONS[0]), int(DIMENSIONS[1]))))), OUTPUT_LOCATION="C:\\Users\\My Dell\\Desktop\\", OUTPUT_FILE_NAME="Map")
 	# await client.post_image(IMAGE_LOCATION)
