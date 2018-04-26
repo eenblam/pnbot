@@ -141,14 +141,15 @@ async def on_message(message):
     elif message.content.startswith('!sleep'):
         await asyncio.sleep(5)
         await client.send_message(message.channel, 'Done sleeping')
-    elif message.content.startswith("!roll"):  # "!roll 3d6". TODO includes XdY + Z, XdY + ZdN, hits/dicepools, and exploding dice.
-        func_input = message.content[6:].split("d")
-	results = roll_dice(int(func_input[0]), int(func_input[1]))
-	diceroll = "Rolled a " + str(sum(results)) + ", " +str(results)
-        await client.send_message(message.channel, diceroll))
-    elif message.content.startswith("!map"):  # "!map 400, 800".
+    elif message.content.startswith("!roll"):  # Example: "!roll 3d6".
+	# TODO: include "XdY + Z", "XdY + ZdN", hits/dicepools, and exploding dice.
+        FUNC_INPUT = message.content[6:].split("d")
+	DICEROLL = roll_dice(int(FUNC_INPUT[0]), int(FUNC_INPUT[1]))
+	RESULTS = "Rolled a " + str(sum(DICEROLL)) + ", " +str(DICEROLL)
+        await client.send_message(message.channel, RESULTS))
+    elif message.content.startswith("!map"):  # Example: "!map 400, 800".
         DIMENSIONS = message.content[5:].split(", ")
-        save_to_image(delake(blur(walk(build(int(DIMENSIONS[0]), int(DIMENSIONS[1]))))), OUTPUT_LOCATION="C:\\Users\\My Dell\\Desktop\\", OUTPUT_FILE_NAME="Map")
+        # save_to_image(delake(blur(walk(build(int(DIMENSIONS[0]), int(DIMENSIONS[1]))))), OUTPUT_LOCATION="C:\\Users\\My Dell\\Desktop\\", OUTPUT_FILE_NAME="Map")
 	# await client.post_image(IMAGE_LOCATION)
         
 client.run(token)
