@@ -7,7 +7,7 @@ from secrets import token
 from random import randint
 from PIL import Image  # !Dependency! Pillow module is not standard
 
-# Since I don't know what I'm doing, I'm assuming I can write my definitions here and have them called within the client event
+# Since I don't know what I'm doing, I'm assuming I can write my functions here and have them called within the main client event
 def build(width=500, height=500):
 	empty_map = []
 	for y in range(max(50, min(999, height))+1):
@@ -34,12 +34,9 @@ def walk(empty_map):
 			walker_y -= 1
 		else:
 			walker_x -= 1
-		if (walker_x < 1) or (walker_x > WIDTH-2):
+		if (walker_x < 1) or (walker_x > WIDTH-2) or (walker_y < 1) or (walker_y > HEIGHT-2):  # Cuts off before hitting the edge in order for the blur function to work optimally
 			walker_x = int(WIDTH/2)
 			walker_y = int(HEIGHT/2)
-		if (walker_y < 1) or (walker_y > HEIGHT-2):
-			walker_x = int(WIDTH / 2)
-			walker_y = int(HEIGHT / 2)
 		walked_map[walker_y][walker_x] += 1
 	return walked_map
 
@@ -140,8 +137,9 @@ async def on_message(message):
     elif message.content.startswith("!d6"):
         diceroll = "Rolled a " + str(randint(1,6))
         await client.send_message(message.channel, diceroll))
-    elif message.content.startswith("!map"):
+    elif message.content.startswith("!map"):  # Example of syntax: "!map 400, 800" to produce a 400x800 map
         DIMENSIONS = message.content[5:].split(", ")
         save_to_image(delake(blur(walk(build(int(DIMENSIONS[0]), int(DIMENSIONS[1]))))), OUTPUT_LOCATION="C:\\Users\\My Dell\\Desktop\\", OUTPUT_FILE_NAME="Map")
+	# await client.post_image(IMAGE_LOCATION)
         
 client.run(token)
