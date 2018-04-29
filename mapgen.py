@@ -1,5 +1,5 @@
 from random import randint
-from PIL import Image  # !Dependency! Pillow module is not standard
+from PIL import Image  # ! DEPENDENCY ! Pillow module is not standard!
 
 
 def build(width=500, height=500):
@@ -104,5 +104,5 @@ def save_to_image(finished_map, location, name):
 				output.append(12644576)
 			else:
 				output.append(8192 + 131843*multiplier*finished_map[y][x])
-	to_image.putdata(tuple(output))
-	to_image.save(location+name+".png")
+	to_image.putdata(tuple(output))  # I don't know the details of how Pillow handles data...
+	to_image.save(location+name+".png")  # ...Or how to save said data arbitrarily to a database or whatever we decide on.
