@@ -1,5 +1,6 @@
 from random import randint
 
+
 def roll(dice_count, dice_size=0, explode_criteria=0):
     if dice_size == 0:
         return [dice_count]
@@ -15,12 +16,14 @@ def roll(dice_count, dice_size=0, explode_criteria=0):
                 rolls.append(die)
         return rolls
 
+
 def drop_low(rolls, number=1):
     if number >= len(rolls):
         return []
     else:
         rolls.sort()
         return rolls[number:]
+
 
 def drop_high(rolls, number=1):
     if number >= len(rolls):
@@ -29,16 +32,20 @@ def drop_high(rolls, number=1):
         rolls.sort()
         return rolls[:-number]
 
+
 def count(rolls, hit):
     return len([i for i in rolls if i >= hit])
+
 
 def parse(string):
     UNPARSED = string.split("d")
     EXPLOSIONS = len([x for x in UNPARSED[1] if x == "!"])
     if EXPLOSIONS:
-        roll(int(UNPARSED[0]), int(UNPARSED[1][:-EXPLOSIONS]), EXPLOSIONS)
+        OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1][:-EXPLOSIONS]), EXPLOSIONS)
     else:
-        roll(int(UNPARSED[0]), int(UNPARSED[1]))
+        OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1]))
+    return OUTPUT
+
 
 def preparse(string):
     check = string.split(" ")
