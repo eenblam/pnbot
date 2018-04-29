@@ -35,7 +35,10 @@ def count(rolls, hit):
 def parse(string):
     UNPARSED = string.split("d")
     EXPLOSIONS = len([x for x in UNPARSED[1] if x == "!"])
-    roll(int(UNPARSED[0]), int(UNPARSED[1][:-EXPLOSIONS]), EXPLOSIONS)
+    if EXPLOSIONS:
+        roll(int(UNPARSED[0]), int(UNPARSED[1][:-EXPLOSIONS]), EXPLOSIONS)
+    else:
+        roll(int(UNPARSED[0]), int(UNPARSED[1]))
 
 def preparse(string):
     check = string.split(" ")
