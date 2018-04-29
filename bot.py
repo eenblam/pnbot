@@ -6,8 +6,7 @@ import asyncio
 from mapgen import *  # Did I set up the module correctly?
 from dice import *
 from secrets import token
-from random import randint
-from PIL import Image  # ! DEPENDENCY ! Pillow module is not standard. Also, if I import this as part of another module, then import THAT module, then I *shouldn't* need to import it again, correct?
+
 
 client = discord.Client()
 
