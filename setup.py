@@ -6,6 +6,7 @@ setup(
         packages=find_packages(),
         install_requires=[
             'discord.py',
+            'Pillow'
             ],
         entry_points={},
         )
