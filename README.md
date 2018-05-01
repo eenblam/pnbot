@@ -1,7 +1,7 @@
 # Push Nerdifications Bot
 A Discord bot.
 
-## Dice roll syntax examples:
+### Dice roll syntax examples:
 *"!roll 3d6"*
 * "Rolled a 17, ((6, 5, 6))"
 >
