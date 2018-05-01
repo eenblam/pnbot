@@ -15,12 +15,9 @@ A Discord bot.
 * "Rolled a 6, ((1, 1, 4))"
 > dropped the highest roll
 *"!roll 2d4+"*
-* "Rolled a 4, ((4]]"
+* "Rolled a 4, ((4))"
 > dropped the lowest roll
 *"!roll 3d6!!"*
 * "Rolled a 24, ((1, 6, 3, 5, 5, 4))"
 > made a bonus roll whenever a die came up as one of the top two results (5 or 6)
-*"!roll 1d4 - 1d4"*
-* "Rolled a 2, ((3), (-1))"
-> rolls can subtracted as well
 
