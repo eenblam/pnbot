@@ -1,69 +1,76 @@
 from random import randint
 
 
-def roll(dice_count, dice_size, explode_criteria=0, implode_criteria=0):
-    if explode_criteria >= dice_size:
-        explode_criteria = 0
-    if implode_criteria >= dice_size:
-        implode_criteria = 0
+def roll(dice_count, dice_size, features=(0, 0, 0, 0)):
+    for i in [features[0], features[1], features[0]+features[1]]:
+        if i >= dice_size:
+            features[0] = 0
+            features[1] = 0
+            break
+    for i in [features[2], features[3], features[2]+features[3]]:
+        if i >= dice_count:
+            features[2] = 0
+            features[3] = 0
+            break
+    EXPLODE = dice_size-features[0]
+    IMPLODE = features[1]
+    CAP_MIN = features[2]
+    CAP_MAX = features[3]
     rolls = []
     for i in range(dice_count):
         die = randint(1, dice_size)
         rolls.append(die)
-        while die > (dice_size-explode_criteria) or die <= implode_criteria:
+        while die > EXPLODE or die <= IMPLODE:
             die = randint(1, dice_size)
             rolls.append(die)
-    return rolls
-
-
-def drop_low(rolls, number=1):
-    if number >= len(rolls):
-        return []
-    else:
+    if CAP_MIN or CAP_MAX:
         rolls.sort()
-        return rolls[number:]
-
-
-def drop_high(rolls, number=1):
-    if number >= len(rolls):
-        return []
+        return rolls[CAP_MIN:(len(rolls)-CAP_MAX)]
     else:
-        rolls.sort()
-        return rolls[:-number]
-
-
-def count(rolls, hit):
-    return len([i for i in rolls if i >= hit])
+        return rolls
 
 
 def parse(string):
     UNPARSED = string.split("d")
-    if len(UNPARSED) == 1:
+    if len(UNPARSED) == 0:
+        OUTPUT = 0
+    elif len(UNPARSED) == 1:
         OUTPUT = int(UNPARSED[0])
     else:
-        EXPLOSIONS = len([x for x in UNPARSED[1] if x == "!"])
-        IMPLOSIONS = len([x for x in UNPARSED[1] if x == "?"])
-        if EXPLOSIONS and IMPLOSIONS:
-            OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1][:-(EXPLOSIONS+IMPLOSIONS)]), EXPLOSIONS, IMPLOSIONS)
-        elif EXPLOSIONS:
-            OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1][:-EXPLOSIONS]), EXPLOSIONS)
-        elif IMPLOSIONS:
-            OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1][:-IMPLOSIONS]), 0, IMPLOSIONS)
+        EXCLAMATIONS = len([x for x in UNPARSED[1] if x == "!"])
+        QUESTIONS = len([x for x in UNPARSED[1] if x == "?"])
+        PLUSES = len([x for x in UNPARSED[1] if x == "+"])
+        MINUSES = len([x for x in UNPARSED[1] if x == "-"])
+        if EXCLAMATIONS or QUESTIONS or PLUSES or MINUSES:
+            OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1][:-(EXCLAMATIONS+QUESTIONS+PLUSES+MINUSES)]), [EXCLAMATIONS, QUESTIONS, PLUSES, MINUSES])
         else:
             OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1]))
     return OUTPUT
 
 
 def preparse(string):
-    check = string.split(" ")
-    sums = []
+    CHECK = string.split(" ")
     rolls = []
+    score = 0
     negative = False
-    for i in range(len(check)):
-        if check[i] == "-":
+    if CHECK[0][:3] == "hit":
+        COUNTER = int(CHECK[0][3:])
+        TRUE_START = 1
+    else:
+        COUNTER = 0
+        TRUE_START = 0
+    for i in range(TRUE_START, len(CHECK)):
+        if CHECK[i] == "-":
             negative = True
-        elif check[i] not in ["-", "+"]:
-            rolls.append(parse(check[i]))
-            sums.append(sum(rolls[-1])*((-1)**negative))
+        elif CHECK[i] not in ["-", "+"]:
+            rolls.append(parse(CHECK[i]))
+            if negative:
+                rolls[-1] = [-i for i in rolls[-1]]
             negative = False
-    return [sum(sums), rolls]
+    if COUNTER:
+        for i in rolls:
+            score += len([x for x in i if x >= COUNTER])
+    else:
+        for i in rolls:
+            score += sum(i)
+    return [score, rolls]
