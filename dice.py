@@ -1,14 +1,16 @@
 from random import randint
 
 
-def roll(dice_count, dice_size, explode_criteria=0):
+def roll(dice_count, dice_size, explode_criteria=0, implode_criteria=0):
     if explode_criteria >= dice_size:
         explode_criteria = 0
+    if implode_criteria >= dice_size:
+        implode_criteria = 0
     rolls = []
     for i in range(dice_count):
         die = randint(1, dice_size)
         rolls.append(die)
-        while die > (dice_size-explode_criteria):
+        while die > (dice_size-explode_criteria) or die <= implode_criteria:
             die = randint(1, dice_size)
             rolls.append(die)
     return rolls
@@ -40,8 +42,13 @@ def parse(string):
         OUTPUT = int(UNPARSED[0])
     else:
         EXPLOSIONS = len([x for x in UNPARSED[1] if x == "!"])
-        if EXPLOSIONS:
+        IMPLOSIONS = len([x for x in UNPARSED[1] if x == "?"])
+        if EXPLOSIONS and IMPLOSIONS:
+            OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1][:-(EXPLOSIONS+IMPLOSIONS)]), EXPLOSIONS, IMPLOSIONS)
+        elif EXPLOSIONS:
             OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1][:-EXPLOSIONS]), EXPLOSIONS)
+        elif IMPLOSIONS:
+            OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1][:-IMPLOSIONS]), 0, IMPLOSIONS)
         else:
             OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1]))
     return OUTPUT
