@@ -2,17 +2,17 @@ from random import randint
 
 
 def roll(dice_count, dice_size, features=(0, 0, 0, 0)):
-    for i in [features[0], features[1], features[0]+features[1]]:
+    for i in [features[0], features[1], features[0] + features[1]]:
         if i >= dice_size:
             features[0] = 0
             features[1] = 0
             break
-    for i in [features[2], features[3], features[2]+features[3]]:
+    for i in [features[2], features[3], features[2] + features[3]]:
         if i >= dice_count:
             features[2] = 0
             features[3] = 0
             break
-    EXPLODE = dice_size-features[0]
+    EXPLODE = dice_size - features[0]
     IMPLODE = features[1]
     CAP_MIN = features[2]
     CAP_MAX = features[3]
@@ -25,7 +25,7 @@ def roll(dice_count, dice_size, features=(0, 0, 0, 0)):
             rolls.append(die)
     if CAP_MIN or CAP_MAX:
         rolls.sort()
-        return rolls[CAP_MIN:(len(rolls)-CAP_MAX)]
+        return rolls[CAP_MIN:(len(rolls) - CAP_MAX)]
     else:
         return rolls
 
@@ -42,7 +42,8 @@ def parse(string):
         PLUSES = len([x for x in UNPARSED[1] if x == "+"])
         MINUSES = len([x for x in UNPARSED[1] if x == "-"])
         if EXCLAMATIONS or QUESTIONS or PLUSES or MINUSES:
-            OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1][:-(EXCLAMATIONS+QUESTIONS+PLUSES+MINUSES)]), [EXCLAMATIONS, QUESTIONS, PLUSES, MINUSES])
+            OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1][:-(EXCLAMATIONS + QUESTIONS + PLUSES + MINUSES)]),
+                          [EXCLAMATIONS, QUESTIONS, PLUSES, MINUSES])
         else:
             OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1]))
     return OUTPUT
