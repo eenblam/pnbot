@@ -3,7 +3,7 @@ import os
 import discord
 import asyncio
 
-from mapgen.mapgen import *  # Did I set up the module correctly?
+from mapgen.mapgen import *
 from dice.dice import *
 from secrets import token
 
@@ -29,11 +29,9 @@ async def on_message(message):
         await asyncio.sleep(5)
         await client.send_message(message.channel, 'Done sleeping')
     elif message.content.startswith("!roll"):  # Example: "!roll 3d6".
-        DICEROLL = preparse(message.content[6:])
-        RESULTS = "Rolled a " + str(DICEROLL[0]) + ", " + str(DICEROLL[1])
-        await client.send_message(message.channel, RESULTS)
+        await client.send_message(message.channel, prepreparse(message.content[6:]))
     elif message.content.startswith("!map"):  # Example: "!map 400, 800".
-        DIMENSIONS = message.content[5:].split(", ")
+        dimensions = message.content[5:].split(", ")
 
         # ! The Pillow module, and by extension mapgen, requires a file destination by default.
         #  I'll need help setting it up/changing it to store to a database. Alternatively,
@@ -45,8 +43,8 @@ async def on_message(message):
                 blur(
                     walk(
                         build(
-                            int(DIMENSIONS[0]),
-                            int(DIMENSIONS[1])
+                            int(dimensions[0]),
+                            int(dimensions[1])
                         )
                     )
                 )
