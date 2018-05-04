@@ -69,5 +69,5 @@ def prepreparse(string):
         score = len([x for x in dice if x >= hit_criteria])
     else:
         score = sum(dice)
-    return "Rolled a " + str(score) + ".\n    (" + str(dice) + ")"
+    return "Rolled a " + str(score) + ".\n    " + str(dice)
 
