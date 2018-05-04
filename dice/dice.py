@@ -1,77 +1,73 @@
 from random import randint
 
 
-def roll(dice_count, dice_size, features=(0, 0, 0, 0)):
-    for i in [features[0], features[1], features[0] + features[1]]:
-        if i >= dice_size:
-            features[0] = 0
-            features[1] = 0
-            break
-    for i in [features[2], features[3], features[2] + features[3]]:
-        if i >= dice_count:
-            features[2] = 0
-            features[3] = 0
-            break
-    EXPLODE = dice_size - features[0]
-    IMPLODE = features[1]
-    CAP_MIN = features[2]
-    CAP_MAX = features[3]
+def roll(dice_count, dice_size, explode=0, implode=0):
+    if explode + implode >= dice_size:
+        implode = 0
+        explode = 0
     rolls = []
     for i in range(dice_count):
         die = randint(1, dice_size)
         rolls.append(die)
-        while die > EXPLODE or die <= IMPLODE:
+        loop_is_sane = 63  # Arbitrary limit on number of dice gained by explosions
+        while (die > (dice_size - explode) or die <= implode) and loop_is_sane:  # Duck typing logic gates ftw
             die = randint(1, dice_size)
             rolls.append(die)
-    if CAP_MIN or CAP_MAX:
-        rolls.sort()
-        return rolls[CAP_MIN:(len(rolls) - CAP_MAX)]
-    else:
-        return rolls
+            loop_is_sane -= 1
+    return rolls
 
 
 def parse(string):
-    UNPARSED = string.split("d")
-    if len(UNPARSED) == 0:
-        OUTPUT = 0
-    elif len(UNPARSED) == 1:
-        OUTPUT = int(UNPARSED[0])
+    unparsed = string.split("d")
+    if len(unparsed) == 0:
+        output = 0
+    elif len(unparsed) == 1:
+        output = int(unparsed[0])
     else:
-        EXCLAMATIONS = len([x for x in UNPARSED[1] if x == "!"])
-        QUESTIONS = len([x for x in UNPARSED[1] if x == "?"])
-        PLUSES = len([x for x in UNPARSED[1] if x == "+"])
-        MINUSES = len([x for x in UNPARSED[1] if x == "-"])
-        if EXCLAMATIONS or QUESTIONS or PLUSES or MINUSES:
-            OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1][:-(EXCLAMATIONS + QUESTIONS + PLUSES + MINUSES)]),
-                          [EXCLAMATIONS, QUESTIONS, PLUSES, MINUSES])
+        explode_criteria = len([x for x in unparsed[1] if x == "!"])
+        implode_criteria = len([x for x in unparsed[1] if x == "?"])
+        drop_lowest = len([x for x in unparsed[1] if x == "+"])
+        drop_highest = len([x for x in unparsed[1] if x == "-"])
+        if explode_criteria or implode_criteria or drop_lowest or drop_highest:
+            output = roll(int(unparsed[0]),
+                          int(unparsed[1][:-(explode_criteria + implode_criteria + drop_lowest + drop_highest)]),
+                          explode_criteria, implode_criteria)
         else:
-            OUTPUT = roll(int(UNPARSED[0]), int(UNPARSED[1]))
-    return OUTPUT
+            output = roll(int(unparsed[0]), int(unparsed[1]))
+        if drop_lowest or drop_highest:
+            output.sort()
+            output = output[drop_lowest:len(output)-drop_highest]
+    return output
 
 
 def preparse(string):
-    CHECK = string.split(" ")
+    to_check = string.split(" ")
     rolls = []
-    score = 0
     negative = False
-    if CHECK[0][:3] == "hit":
-        COUNTER = int(CHECK[0][3:])
-        TRUE_START = 1
-    else:
-        COUNTER = 0
-        TRUE_START = 0
-    for i in range(TRUE_START, len(CHECK)):
-        if CHECK[i] == "-":
+    for i in range(len(to_check)):
+        if to_check[i] == "-":
             negative = True
-        elif CHECK[i] not in ["-", "+"]:
-            rolls.append(parse(CHECK[i]))
+        elif to_check[i] != "+":  # TODO? Exception handling for weird inputs ("*", "/", etc)
+            temp_rolls = parse(to_check[i])
             if negative:
-                rolls[-1] = [-i for i in rolls[-1]]
+                temp_rolls = [-i for i in temp_rolls]
             negative = False
-    if COUNTER:
-        for i in rolls:
-            score += len([x for x in i if x >= COUNTER])
+            for j in temp_rolls:
+                rolls.append(j)
+    return rolls
+
+
+def prepreparse(string):
+    check = string.split(" ")
+    if check[0][:3] == "hit":
+        hit_criteria = int(check[0][3:])
+        dice = preparse(" ".join(check[1:]))
     else:
-        for i in rolls:
-            score += sum(i)
-    return [score, rolls]
+        hit_criteria = 0
+        dice = preparse(string)
+    if hit_criteria:
+        score = len([x for x in dice if x >= hit_criteria])
+    else:
+        score = sum(dice)
+    return "Rolled a " + str(score) + ".\n    (" + str(dice) + ")"
+
