@@ -2,7 +2,23 @@ from random import randint
 from PIL import Image  # ! DEPENDENCY ! Pillow module is not standard!
 
 
-def build(width=500, height=500):
+def map_parse(split_string):
+    try:
+        output = [int(x) for x in split_string]
+    except:
+        output = []
+    if len(output) > 2:
+        output = output[:2]
+    elif len(output) == 1:
+        output.append(500)
+    elif len(output) == 0:
+        output = [500, 500]
+    return output
+
+
+def build(xy_coordinates_as_list):
+    width = xy_coordinates_as_list[0]
+    height = xy_coordinates_as_list[1]
     empty_map = []
     for y in range(max(50, min(999, height)) + 2):
         row = []
@@ -88,7 +104,7 @@ def delake(blurred_map):
     return lakeless_map
 
 
-def save_to_image(finished_map, file_destination):
+def save_to_image(finished_map, file_location):
     finished_map = finished_map[1:-1]
     for n in range(len(finished_map)):
         finished_map[n] = finished_map[n][1:-1]
@@ -112,4 +128,4 @@ def save_to_image(finished_map, file_destination):
             else:
                 output.append(8192 + 131843 * multiplier * finished_map[y][x])
     to_image.putdata(tuple(output))
-    to_image.save(file_destination)
+    to_image.save(file_location)
