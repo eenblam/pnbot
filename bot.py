@@ -9,6 +9,8 @@ from secrets import token
 
 client = discord.Client()
 
+LOCAL_STORAGE = "C:\\Users\\My Dell\\Google Drive\\MAP.png"  # When running pnbot locally, set this to desired file location.
+
 
 @client.event
 async def on_ready():
@@ -32,12 +34,7 @@ async def on_message(message):
         await client.send_message(message.channel, prepreparse(message.content[6:]))
     elif message.content.startswith("!map"):  # Example: "!map 400, 800".
         dimensions = message.content[5:].split(", ")
-
-        # ! The Pillow module, and by extension mapgen, requires a file destination by default.
-        #  I'll need help setting it up/changing it to store to a database. Alternatively,
-        # the bot could only bother storing one map at a time, long enough to post it,
-        # leaving the more long-term storage to Discord and/or a secondary bot.
-
+        await client.send_message(message.channel, "Building map, please wait")
         save_to_image(
             delake(
                 blur(
@@ -49,12 +46,9 @@ async def on_message(message):
                     )
                 )
             ),
-            OUTPUT_LOCATION="~/mapgen/results",
-            OUTPUT_FILE_NAME="Map"
+            LOCAL_STORAGE
         )
-
-        # await client.post_image(IMAGE_LOCATION)
-        #  ! Dummy function. I'll be surprised if post_image() is an actual thing.
+        await client.send_file(message.channel, LOCAL_STORAGE)
 
 
 client.run(token)
