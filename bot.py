@@ -5,7 +5,7 @@ import asyncio
 
 from mapgen.mapgen import *
 from dice.dice import *
-from secret.secret import *
+from sneakrets.sneakrets import *
 from secrets import token
 
 
@@ -33,7 +33,7 @@ async def on_message(message):
         await asyncio.sleep(5)
         await client.send_message(message.channel, 'Done sleeping')
     elif message.content.startswith("!secret"):
-        await client.send_message(message.author, secret())
+        await client.send_message(message.author, sneakret())
     elif message.content.startswith("!roll"):  # Example: "!roll 3d6".
         await client.send_message(message.channel, prepreparse(message.content[6:]))
     elif message.content.startswith("!map"):  # Example: "!map 400, 800".
