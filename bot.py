@@ -1,4 +1,4 @@
-import os
+import os  # Pycharm says this import isn't doing anything.
 
 import discord
 import asyncio
@@ -6,6 +6,7 @@ import asyncio
 from mapgen.mapgen import *
 from dice.dice import *
 from secrets import token
+
 
 client = discord.Client()
 
@@ -40,13 +41,11 @@ async def on_message(message):
                 blur(
                     walk(
                         build(
-                            int(dimensions[0]),
-                            int(dimensions[1])
+                            map_parse(dimensions)
                         )
                     )
                 )
-            ),
-            LOCAL_STORAGE
+            ), LOCAL_STORAGE
         )
         await client.send_file(message.channel, LOCAL_STORAGE)
 
