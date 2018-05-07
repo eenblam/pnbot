@@ -4,14 +4,19 @@ A Discord bot.
 ### Features:
 *!map*
 > Creates a randomly generated world map.
+>
 *!roll*
 > Rolls dice
+>
 *!secret*
 > Sends you a secret message
+>
 *!sleep*
 > Puts PNbot to sleep for 5 seconds
+>
 *!test*
 > Counts previous messages
+>
 
 ##### !roll examples:
 *"!roll 3d6"*
