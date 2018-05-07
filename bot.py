@@ -11,7 +11,8 @@ from secrets import token
 
 client = discord.Client()
 
-LOCAL_STORAGE = "C:\\Users\\My Dell\\Google Drive\\MAP.png"  # When running pnbot locally, set this to desired file location.
+LOCAL_STORAGE = "C:\\Users\\My Dell\\Google Drive\\MAP.png"
+# Used for temporarily storing randomly generated maps. When running pnbot locally, set this to your desired file location.
 
 
 @client.event
