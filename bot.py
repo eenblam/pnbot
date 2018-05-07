@@ -34,7 +34,7 @@ async def on_message(message):
         await client.send_message(message.channel, prepreparse(message.content[6:]))
     elif message.content.startswith("!map"):  # Example: "!map 400, 800".
         dimensions = message.content[5:].split(", ")
-        await client.send_message(message.channel, "Building map, please wait")
+        await client.send_message(message.channel, "Building map, please wait...")
         save_to_image(
             delake(
                 blur(
