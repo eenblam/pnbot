@@ -7,10 +7,11 @@ LIST_OF_SECRETS = [
     "You can toggle the [Jog] ability by pressing the [Walk] key while already walking.",
     "The human colon actually has a second sphincter muscle.",
     "Taxation is theft.",
-    "When fermented, grapes of wrath become unpleasant whine.",
+    "If left long enough to ferment, grapes of wrath become a bitter whine.",
     "The term 'childbirth' is either redundant or has frightening implications.",
     "Despite their name, dragons rarely drag things onto other things.",
-    "Babies are neither insects nor can they often be found in bays."
+    "Babies are neither commonly found in bays, nor are they a type of bee.",
+    "You can ask me to !eval python 3 expressions"
 ]
 
 def sneakret():
