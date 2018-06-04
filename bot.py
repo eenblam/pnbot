@@ -9,14 +9,13 @@ from sneakrets.sneakrets import *
 from auction.auction import *
 from secrets import token
 
-
 client = discord.Client()
 
-LOCAL_STORAGE = "C:\\Users\\My Dell\\Google Drive\\MAP.png"
-# Used for temporarily storing randomly generated maps. When running pnbot locally, set this to your desired file location.
+LOCAL_STORAGE = "C:\\Users\\My Dell\\Desktop\\MAP.png"  # When running pnbot locally, set this to desired file location.
+
 
 MESSAGE_LOGS = {}
-GOLD = {"Extra": 0, "pnbot#0050": 0}
+GOLD = {"pnbot#0050": 0}
 BUSY = False
 
 
@@ -32,9 +31,7 @@ async def on_message(message):
     if str(message.author) not in GOLD.keys():
         GOLD[str(message.author)] = 100
         await client.send_message(message.author, "You've been allocated 100 Gold to spend on auctions.\nYou can check your current balance at any time with **!bank**.")
-    if message.content.startswith("!help"):
-        await client.send_message(message.channel, "Current commands include:\n\t!test\n\t!sleep\n\t!secret\n\t!roll\n\t!map")
-    elif message.content.startswith('!test'):
+    if message.content.startswith('!test'):
         counter = 0
         tmp = await client.send_message(message.channel, 'Calculating messages...')
         async for log in client.logs_from(message.channel, limit=100):
@@ -44,8 +41,6 @@ async def on_message(message):
     elif message.content.startswith('!sleep'):
         await asyncio.sleep(5)
         await client.send_message(message.channel, 'Done sleeping')
-    elif message.content.startswith("!secret"):
-        await client.send_message(message.author, sneakret())
     elif message.content.startswith("!roll"):  # Example: "!roll 3d6".
         await client.send_message(message.channel, prepreparse(message.content[6:]))
     elif message.content.startswith("!map") and not BUSY:  # Example: "!map 400, 800".
@@ -65,6 +60,8 @@ async def on_message(message):
         )
         await client.send_file(message.channel, LOCAL_STORAGE)
         BUSY = False
+    elif message.content.startswith("!secret"):
+        await client.send_message(message.author, sneakret())
     elif message.content.startswith("!eval"):
         try:
             await client.send_message(message.channel, str(eval(message.content[6:])))
@@ -99,20 +96,24 @@ async def on_message(message):
         await asyncio.sleep(1)
         result = find_winner(MESSAGE_LOGS)
         todo = redist(MESSAGE_LOGS, GOLD["pnbot#0050"])
-                if len(result) != 1:
+        if len(result) != 1:
             GOLD[result[1]] -= result[2]
             GOLD["pnbot#0050"] = todo[1]
             for x in todo[0]:
                 GOLD[x[0]] += x[1]
+        else:
+            GOLD["pnbot#0050"] += result[2]
         for i in MESSAGE_LOGS.keys():
             MESSAGE_LOGS[i] = 0
         await client.send_message(message.channel, result[0])
         BUSY = False
+    elif (message.content.startswith("!auction") or message.content.startswith("!map")) and BUSY:
+        await client.send_message(message.author, "I am currently busy. Please try again in a moment.")
     elif str(message.author) != "pnbot#0050" and message.channel in client.private_channels:
         try:
             MESSAGE_LOGS[str(message.author)] = min(GOLD[str(message.author)], max(0, int(message.content)))
         except:
             pass
-        
+
 
 client.run(token)
