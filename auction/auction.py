@@ -21,7 +21,7 @@ def find_winner(bids):
 
 
 def redist(wagers, extra):
-    wagers = [x for x in wagers if x[1] != 0]
+    wagers = [[x, wagers[x]] for x in wagers if x[1] != 0]
     if len(wagers) == 1:
         return [[], extra + wagers[0][1]]
     else:
