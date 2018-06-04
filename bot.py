@@ -17,6 +17,7 @@ LOCAL_STORAGE = "C:\\Users\\My Dell\\Google Drive\\MAP.png"
 
 MESSAGE_LOGS = {}
 GOLD = {"Extra": 0, "pnbot#0050": 0}
+BUSY = False
 
 
 @client.event
@@ -27,8 +28,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    flag_auction = False
-    flag_map = False
+    global BUSY
     if str(message.author) not in GOLD.keys():
         GOLD[str(message.author)] = 100
         await client.send_message(message.author, "You've been allocated 100 Gold to spend on auctions.\nYou can check your current balance at any time with **!bank**.")
@@ -48,8 +48,8 @@ async def on_message(message):
         await client.send_message(message.author, sneakret())
     elif message.content.startswith("!roll"):  # Example: "!roll 3d6".
         await client.send_message(message.channel, prepreparse(message.content[6:]))
-    elif message.content.startswith("!map") and not flag_map:  # Example: "!map 400, 800".
-        flag_map = True
+    elif message.content.startswith("!map") and not BUSY:  # Example: "!map 400, 800".
+        BUSY = True
         dimensions = message.content[5:].split(", ")
         await client.send_message(message.channel, "Building map, please wait...")
         save_to_image(
@@ -64,7 +64,7 @@ async def on_message(message):
             ), LOCAL_STORAGE
         )
         await client.send_file(message.channel, LOCAL_STORAGE)
-        flag_map = False
+        BUSY = False
     elif message.content.startswith("!eval"):
         try:
             await client.send_message(message.channel, str(eval(message.content[6:])))
@@ -77,8 +77,8 @@ async def on_message(message):
             await client.send_message(message.author, "No wager found.\n*Your current balance is " + str(GOLD[str(message.author)]) + " Gold.*")
         else:
             await client.send_message(message.author, "Your current wager is " + str(MESSAGE_LOGS[str(message.author)]) + " out of " + str(GOLD[str(message.author)]) + " Gold.")
-    elif message.content.startswith("!auction") and message.channel not in client.private_channels and not flag_auction:
-        flag_auction = True
+    elif message.content.startswith("!auction") and message.channel not in client.private_channels and not BUSY:
+        BUSY = True
         for i in MESSAGE_LOGS:
             MESSAGE_LOGS[i] = 0
         await client.send_message(message.channel, "**BEGINNING SECRET AUCTION!**\nPlease send me a direct message with your wager.")
@@ -107,7 +107,7 @@ async def on_message(message):
         for i in MESSAGE_LOGS.keys():
             MESSAGE_LOGS[i] = 0
         await client.send_message(message.channel, result[0])
-        flag_auction = False
+        BUSY = False
     elif str(message.author) != "pnbot#0050" and message.channel in client.private_channels:
         try:
             MESSAGE_LOGS[str(message.author)] = min(GOLD[str(message.author)], max(0, int(message.content)))
