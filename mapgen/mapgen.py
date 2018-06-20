@@ -20,10 +20,10 @@ def build(xy_coordinates_as_list):
     width = xy_coordinates_as_list[0]
     height = xy_coordinates_as_list[1]
     empty_map = []
+    row = []
+    for x in range(max(50, min(999, width)) + 2):
+        row.append(0)
     for y in range(max(50, min(999, height)) + 2):
-        row = []
-        for x in range(max(50, min(999, width)) + 2):
-            row.append(0)
         empty_map.append(row)
     return empty_map
 
