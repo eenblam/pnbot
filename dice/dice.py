@@ -9,7 +9,7 @@ def roll(dice_count, dice_size, explode=0, implode=0):
     for i in range(dice_count):
         die = randint(1, dice_size)
         rolls.append(die)
-        loop_is_sane = 63  # Arbitrary limit on number of dice gained by explosions
+        loop_is_sane = 31  # Arbitrary limit on number of dice gained by explosions
         while (die > (dice_size - explode) or die <= implode) and loop_is_sane:  # Duck typing logic gates ftw
             die = randint(1, dice_size)
             rolls.append(die)
@@ -29,9 +29,12 @@ def parse(string):
         drop_lowest = len([x for x in unparsed[1] if x == "+"])
         drop_highest = len([x for x in unparsed[1] if x == "-"])
         if explode_criteria or implode_criteria or drop_lowest or drop_highest:
-            output = roll(int(unparsed[0]),
-                          int(unparsed[1][:-(explode_criteria + implode_criteria + drop_lowest + drop_highest)]),
-                          explode_criteria, implode_criteria)
+            output = roll(
+                            int(unparsed[0]),
+                            int(unparsed[1][:-(explode_criteria + implode_criteria + drop_lowest + drop_highest)]),
+                            explode_criteria,
+                            implode_criteria
+                        )
         else:
             output = roll(int(unparsed[0]), int(unparsed[1]))
         if drop_lowest or drop_highest:
