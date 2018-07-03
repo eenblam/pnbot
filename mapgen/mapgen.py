@@ -1,4 +1,5 @@
 from random import randint
+from math import ceil
 from PIL import Image  # ! DEPENDENCY ! Pillow module is not standard!
 
 
@@ -44,25 +45,43 @@ def walk(empty_map):
             walker_y -= 1
         else:
             walker_x -= 1
-        if (walker_x < 1) or (walker_x > WIDTH - 2) or (walker_y < 1) or (
-                # Cuts off before hitting the edge in order for the blur function to work optimally
-                walker_y > HEIGHT - 2):
+        if (walker_x < 1) or (walker_x > WIDTH - 2) or (walker_y < 1) or (walker_y > HEIGHT - 2):
+            # Cuts off before hitting the edge in order for the blur function to work optimally
             walker_x = int(WIDTH / 2)
             walker_y = int(HEIGHT / 2)
         walked_map[walker_y][walker_x] += 1
     return walked_map
 
 
-def blur(walked_map):
-    blurred_map = []
+def normalize(walked_map):
+    highest = max([max(x) for x in walked_map])
+    normal_map = []
     for y in range(len(walked_map)):
         row = []
         for x in range(len(walked_map[y])):
-            if y in [0, len(walked_map) - 1] or x in [0, len(walked_map[y]) - 1]:
+            row.append(int((ceil(pow(walked_map[y][x], 2)/highest)+walked_map[y][x])/2))
+        normal_map.append(row)
+    return normal_map
+
+
+def blur(normal_map):
+    blurred_map = []
+    for y in range(len(normal_map)):
+        row = []
+        for x in range(len(normal_map[y])):
+            if y in [0, len(normal_map) - 1] or x in [0, len(normal_map[y]) - 1]:
                 row.append(0)
             else:
-                row.append(int((walked_map[y + 1][x] + walked_map[y - 1][x] + walked_map[y][x + 1] + walked_map[y][
-                    x - 1] + 4 * walked_map[y][x]) / 8))
+                row.append(
+                    int(
+                        (normal_map[y + 1][x] 
+                         + normal_map[y - 1][x] 
+                         + normal_map[y][x + 1] 
+                         + normal_map[y][x - 1] 
+                         + 4 * normal_map[y][x])
+                        / 8
+                    )
+                )
         blurred_map.append(row)
     return blurred_map
 
@@ -83,49 +102,139 @@ def delake(blurred_map):
     for n in range(4):
         for y in range(1, len(lakeless_map) - 1):
             for x in range(1, len(lakeless_map[y]) - 1):
-                if 0 in [lakeless_map[y + 1][x], lakeless_map[y - 1][x], lakeless_map[y][x + 1],
-                         lakeless_map[y][x - 1]] and lakeless_map[y][x] == 1:
+                if 0 in [lakeless_map[y + 1][x], 
+                         lakeless_map[y - 1][x], 
+                         lakeless_map[y][x + 1],
+                         lakeless_map[y][x - 1]
+                        ] and lakeless_map[y][x] == 1:
                     lakeless_map[y][x] = 0
         for x in range(1, len(lakeless_map[0]) - 1)[::-1]:
             for y in range(1, len(lakeless_map) - 1):
-                if 0 in [lakeless_map[y + 1][x], lakeless_map[y - 1][x], lakeless_map[y][x + 1],
-                         lakeless_map[y][x - 1]] and lakeless_map[y][x] == 1:
+                if 0 in [lakeless_map[y + 1][x],
+                         lakeless_map[y - 1][x],
+                         lakeless_map[y][x + 1],
+                         lakeless_map[y][x - 1]
+                        ] and lakeless_map[y][x] == 1:
                     lakeless_map[y][x] = 0
         for y in range(1, len(lakeless_map) - 1)[::-1]:
             for x in range(1, len(lakeless_map[y]) - 1)[::-1]:
-                if 0 in [lakeless_map[y + 1][x], lakeless_map[y - 1][x], lakeless_map[y][x + 1],
-                         lakeless_map[y][x - 1]] and lakeless_map[y][x] == 1:
+                if 0 in [lakeless_map[y + 1][x],
+                         lakeless_map[y - 1][x],
+                         lakeless_map[y][x + 1],
+                         lakeless_map[y][x - 1]
+                        ] and lakeless_map[y][x] == 1:
                     lakeless_map[y][x] = 0
         for x in range(1, len(lakeless_map[0]) - 1):
             for y in range(1, len(lakeless_map) - 1)[::-1]:
-                if 0 in [lakeless_map[y + 1][x], lakeless_map[y - 1][x], lakeless_map[y][x + 1],
-                         lakeless_map[y][x - 1]] and lakeless_map[y][x] == 1:
+                if 0 in [lakeless_map[y + 1][x],
+                         lakeless_map[y - 1][x],
+                         lakeless_map[y][x + 1],
+                         lakeless_map[y][x - 1]
+                        ] and lakeless_map[y][x] == 1:
                     lakeless_map[y][x] = 0
     return lakeless_map
 
 
-def save_to_image(finished_map, file_location):
+"""
+def rainshadow(lakeless_map): # Split into right2left and left2right passes as seperate functions
+    pass1 = []
+    pass2 = []
+    cap = 0
+    for y in range(len(lakeless_map)):
+        row1 = []
+        row2 = []
+        for x in range(len(lakeless_map[0])):
+            if y in [0, 1, len(lakeless_map)-2, len(lakeless_map)-1]:
+                row1.append(0)
+            elif x in [0, 1, len(lakeless_map[0])-2, len(lakeless_map[0])-1]:
+                row1.append(0)
+            else:
+                cap = max(cap, lakeless_map[y][x])
+                if 0 in [lakeless_map[y][x], lakeless_map[y-1][x], lakeless_map[y+1][x], lakeless_map[y][x-1], lakeless_map[y][x+1]]:
+                    cap = 0
+                    row1.append(0)
+                elif lakeless_map[y][x] < cap:
+                    row1.append(cap)
+                else:
+                    row1.append(0)
+        pass1.append(row1)
+        for x in list(range(len(lakeless_map[0])))[::-1]:
+            if y in [0, 1, len(lakeless_map)-2, len(lakeless_map)-1]:
+                row2.append(0)
+            elif x in [0, 1, len(lakeless_map[0])-2, len(lakeless_map[0])-1]:
+                row2.append(0)
+            else:
+                cap = max(cap, lakeless_map[y][x])
+                if 0 in [lakeless_map[y][x], lakeless_map[y-1][x], lakeless_map[y+1][x], lakeless_map[y][x-1], lakeless_map[y][x+1]]:
+                    cap = 0
+                    row2.append(0)
+                elif lakeless_map[y][x] < cap:
+                    row2.append(cap)
+                else:
+                    row2.append(0)
+        pass2.append(row2[::1])
+    output = []
+    for y in range(len(pass1)):
+        row = []
+        for x in range(len(pass1[0])):
+            row.append(max(pass1[y][x], pass2[y][x]))
+        output.append(row)
+    return output
+"""
+
+
+def colorize(finished_map):
+    def RGB(red, green, blue):
+        return red + 256*green + 256*256*blue
+
     finished_map = finished_map[1:-1]
     for n in range(len(finished_map)):
         finished_map[n] = finished_map[n][1:-1]
-    WIDTH = len(finished_map[0])
-    HEIGHT = len(finished_map)
-    HIGHPOINT = max([max(y) for y in finished_map])
+    shadow = rainshadow(finished_map)
+    width = len(finished_map[0])
+    height = len(finished_map)
+    highpoint = max([max(y) for y in finished_map])
     cutoff = 64
     multiplier = 1
-    for number in [16, 8, 4]:
-        if HIGHPOINT < number:
+    for number in [16, 8, 4]: # This loop scales up the color gradient of short landmasses to match tall ones.
+        if highpoint < number:
             cutoff /= 2
             multiplier *= 2
-    to_image = Image.new("RGB", (WIDTH, HEIGHT))
-    output = []
-    for y in range(HEIGHT):
-        for x in range(WIDTH):
-            if finished_map[y][x] == 0:
-                output.append(4202496)  # RGB hex -> decimal. Plz no touchy
-            elif finished_map[y][x] > cutoff:
-                output.append(12644576)
+    colored_map = []
+    for y in range(height):
+        row = []
+        for x in range(width):
+            if finished_map[y][x] == 0: # Ocean
+                row.append(RGB(0, 32, 64))  # 4202496 in decimal.
+            elif finished_map[y][x] > cutoff: # Mountain Caps
+                row.append(RGB(240, 240, 240)) # 15790320 in decimal. Previously 12644576
             else:
-                output.append(8192 + 131843 * multiplier * finished_map[y][x])
-    to_image.putdata(tuple(output))
+                dryness = shadow[y][x]
+                row.append(
+                    RGB(dryness, 32, 0)
+                    + RGB(3, 3, 2) * multiplier * finished_map[y][x]
+                )
+                # 8192, 131843, ??? in decimal
+        colored_map.append(row)
+    return colored_map
+
+
+def generate(split_string, file_location):
+    output = colorize(
+            delake(
+                    blur(
+                        normalize(
+                            walk(
+                                build(
+                                    map_parse(
+                                    split_string
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+    to_image = Image.new("RGB", (len(output[0]), len(output)))
+    to_image.putdata(tuple([x for y in output for x in y]))
     to_image.save(file_location)
